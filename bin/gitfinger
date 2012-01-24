@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+
+require 'time'
+user = ARGV.first 
+if user.nil?
+  $stderr.puts "Usage: #{__FILE__} [a GitHub username]"
+  exit 1
+end
+
+require 'octokit'
+require 'yaml'
+c = Octokit::Client.new 
+begin
+  repos = c.repositories(user, per_page: 300)
+rescue Octokit::NotFound
+  $stderr.puts "GitHub user #{user} not found"
+  exit 1
+end
+
+def truncate(s, len)
+  return unless s
+  s.length > len ? s[0,len-3] + '...' : s
+end
+
+res = repos.map {|r|
+  d = %w( name name   w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, x|
+    m[x[0]] = r[x[1]]
+    m
+  }
+  %w( updated pushed ).each {|x| d[x] = d[x] && DateTime.parse(d[x]) }
+  d['type'] = d['type'] ? 'fork' : 'source'
+  d
+}.sort_by {|x| x['updated']}.reverse
+
+
+def fmt_datetime(t)
+  t.strftime("%b %d %Y")
+end
+
+abort "No repositories found for #{user}" unless !res.empty?
+
+longest_name_len = res.reduce(0) {|max, row| [max, row['name'].length].max }
+
+placeholders = "%#{longest_name_len}s%6s%5s%4s%13s%13s%9s  "
+desc_length = `tput cols`.to_i - (placeholders.scan(/\d+/).map(&:to_i).reduce(0){|sum,x| sum+x} + 3)
+placeholders += "%-#{desc_length}s"
+
+# print headers
+puts placeholders % res[0].keys
+
+res.each {|r|
+  %w( updated pushed ).each {|x| r[x] = r[x] && fmt_datetime(r[x]) }
+  r['desc'] = truncate(r['desc'], desc_length)
+  puts placeholders % r.values
+}
