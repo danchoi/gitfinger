@@ -3,7 +3,7 @@
 require 'time'
 user = ARGV.first 
 if user.nil?
-  $stderr.puts "Usage: #{__FILE__} [a GitHub username]"
+  $stderr.puts "Usage: #{File.basename(__FILE__)} [a GitHub username]"
   exit 1
 end
 
