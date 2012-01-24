@@ -3,13 +3,13 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "gitfinger"
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.platform    = Gem::Platform::RUBY
   s.required_ruby_version = '>= 1.9.0'
 
   s.authors     = ["Daniel Choi"]
   s.email       = ["dhchoi@gmail.com"]
-  s.homepage    = "http://gitihub.com/danchoi/gitfinger"
+  s.homepage    = "http://github.com/danchoi/gitfinger"
   s.summary     = %q{Finger GitHub users}
   s.description = %q{Finger GitHub users}
 
