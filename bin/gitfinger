@@ -23,7 +23,7 @@ def truncate(s, len)
 end
 
 res = repos.map {|r|
-  d = %w( name name   w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, x|
+  d = %w( repo name w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, x|
     m[x[0]] = r[x[1]]
     m
   }
@@ -39,7 +39,7 @@ end
 
 abort "No repositories found for #{user}" unless !res.empty?
 
-longest_name_len = res.reduce(0) {|max, row| [max, row['name'].length].max }
+longest_name_len = res.reduce(0) {|max, row| [max, row['repo'].length].max }
 
 placeholders = "%#{longest_name_len}s%6s%5s%4s%13s%13s%9s  "
 desc_length = `tput cols`.to_i - (placeholders.scan(/\d+/).map(&:to_i).reduce(0){|sum,x| sum+x} + 3)
