@@ -51,5 +51,10 @@ puts placeholders % res[0].keys
 res.each {|r|
   %w( updated pushed ).each {|x| r[x] = r[x] && fmt_datetime(r[x]) }
   r['desc'] = truncate(r['desc'], desc_length)
-  puts placeholders % r.values
+  begin
+    puts placeholders % r.values
+  rescue Errno::EPIPE
+    break
+  end
+
 }
