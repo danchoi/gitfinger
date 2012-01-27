@@ -1,14 +1,34 @@
 #!/usr/bin/env ruby
 
+require 'time'
+require 'octokit'
+require 'yaml'
+require 'optparse'
+
+opts = {}
+OptionParser.new {|o|
+  o.banner = "Usage: gitfinger [GitHub username]"
+  o.separator ""
+  o.separator "Specific options:"
+  o.on("-o", "--order [FIELD]", "Order on FIELD") { |field| opts[:order] = field }
+  o.on("-r", "--reverse", "Reverse standard order") { opts[:reverse] = true }
+  o.on("-h", "--help", "Show this message") { 
+    require 'gitfinger'
+    puts Gitfinger::VERSION
+    puts o 
+  }
+  o.on("-v", "--version", "Show version") { 
+    require 'gitfinger'
+    puts Gitfinger::VERSION
+  }
+}.parse!
+puts opts.inspect
 user = ARGV.first 
 if user.nil?
   $stderr.puts "Usage: #{File.basename(__FILE__)} [a GitHub username]"
   exit 1
 end
 
-require 'time'
-require 'octokit'
-require 'yaml'
 
 c = Octokit::Client.new 
 
