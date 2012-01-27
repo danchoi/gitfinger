@@ -1,15 +1,17 @@
 #!/usr/bin/env ruby
 
-require 'time'
 user = ARGV.first 
 if user.nil?
   $stderr.puts "Usage: #{File.basename(__FILE__)} [a GitHub username]"
   exit 1
 end
 
+require 'time'
 require 'octokit'
 require 'yaml'
+
 c = Octokit::Client.new 
+
 begin
   repos = c.repositories(user, per_page: 300)
 rescue Octokit::NotFound
@@ -31,7 +33,6 @@ res = repos.map {|r|
   d['type'] = d['type'] ? 'fork' : 'source'
   d
 }.sort_by {|x| x['updated']}.reverse
-
 
 def fmt_datetime(t)
   t.strftime("%b %d %Y")
