@@ -12,6 +12,9 @@ op = OptionParser.new {|o|
   o.separator "Specific options:"
   o.on("-s", "--sort [FIELD]", "Order on FIELD") { |field| opts[:sort] = field }
   o.on("-r", "--reverse", "Reverse standard order") { opts[:reverse] = true }
+  o.on("-H", "--no-header", "Suppress header and prefix repo name with user") { 
+    opts[:noheader] = true
+  }
   o.on("-h", "--help", "Show this message") { 
     require 'gitfinger'
     puts "gitfinger #{Gitfinger::VERSION}"
@@ -52,6 +55,7 @@ res = repos.map {|r|
   }
   %w( updated pushed ).each {|x| d[x] = d[x] && DateTime.parse(d[x]) }
   d['type'] = d['type'] ? 'fork' : 'source'
+  d['repo'] = "#{user}/#{d['repo']}" if opts[:noheader]
   d
 }
 
@@ -83,7 +87,7 @@ desc_length = `tput cols`.to_i - (placeholders.scan(/\d+/).map(&:to_i).reduce(0)
 placeholders += "%-#{desc_length}s"
 
 # print headers
-puts placeholders % res[0].keys
+puts(placeholders % res[0].keys) unless opts[:noheader]
 
 res.each {|r|
   %w( updated pushed ).each {|x| r[x] = r[x] && fmt_datetime(r[x]) }
