@@ -6,29 +6,30 @@ require 'yaml'
 require 'optparse'
 
 opts = {}
-OptionParser.new {|o|
+op = OptionParser.new {|o|
   o.banner = "Usage: gitfinger [GitHub username]"
   o.separator ""
   o.separator "Specific options:"
-  o.on("-o", "--order [FIELD]", "Order on FIELD") { |field| opts[:order] = field }
+  o.on("-s", "--sort [FIELD]", "Order on FIELD") { |field| opts[:sort] = field }
   o.on("-r", "--reverse", "Reverse standard order") { opts[:reverse] = true }
   o.on("-h", "--help", "Show this message") { 
     require 'gitfinger'
-    puts Gitfinger::VERSION
+    puts "gitfinger #{Gitfinger::VERSION}"
     puts o 
+    exit
   }
   o.on("-v", "--version", "Show version") { 
     require 'gitfinger'
-    puts Gitfinger::VERSION
+    puts "gitfinger #{Gitfinger::VERSION}"
+    exit
   }
-}.parse!
-puts opts.inspect
+}
+op.parse!
 user = ARGV.first 
 if user.nil?
-  $stderr.puts "Usage: #{File.basename(__FILE__)} [a GitHub username]"
+  $stderr.puts op
   exit 1
 end
-
 
 c = Octokit::Client.new 
 
@@ -45,14 +46,29 @@ def truncate(s, len)
 end
 
 res = repos.map {|r|
-  d = %w( repo name w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, x|
-    m[x[0]] = r[x[1]]
+  d = %w( repo name w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, (display_key,api_key)|
+    m[display_key] = r[api_key]
     m
   }
   %w( updated pushed ).each {|x| d[x] = d[x] && DateTime.parse(d[x]) }
   d['type'] = d['type'] ? 'fork' : 'source'
   d
-}.sort_by {|x| x['updated']}.reverse
+}
+
+sort_field =  opts[:sort] || 'updated' 
+res = res.sort_by {|x| 
+  sort_value = x[sort_field] 
+  if sort_value.nil? 
+    sort_value = Time.at(0).to_date if sort_field =~ /updated|pushed/
+    sort_value = "" if sort_field =~ /desc/
+  end
+  sort_value.downcase! if sort_field == 'repo'
+  sort_value
+}
+
+# default order for date and counts is latest or greatest first
+res.reverse! if %w(updated pushed w i f).member?(sort_field)
+res.reverse! if opts[:reverse]
 
 def fmt_datetime(t)
   t.strftime("%b %d %Y")
