@@ -9,15 +9,16 @@ A simple Ruby gem that lets you finger GitHub users.
     gitfinger [GitHub username] [options]
 
 ## Options
-    
-    -s, --sort [FIELD]               Order on FIELD
-    -r, --reverse                    Reverse standard order
-    -H, --no-header                  Suppress header and prefix repo name with user
-    -h, --help                       Show this message
-    -v, --version                    Show version
-    
+
+    Specific options:
+        -s, --sort FIELD                 Sort on FIELD; you can try to abbreviate FIELD
+        -r, --reverse                    Reverse default order
+        -H, --no-header                  Suppress header and prefix repo name with user
+        -h, --help                       Show this message
+        -v, --version                    Show version
 
 ## Install
 
     gem install gitfinger
+
 
