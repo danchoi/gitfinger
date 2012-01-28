@@ -8,6 +8,11 @@ A simple Ruby gem that lets you finger GitHub users.
 
     gitfinger [GitHub username] [options]
 
+    or 
+
+    gitfinger [options] [GitHub username] 
+
+
 ## Options
 
     Specific options:
@@ -17,7 +22,6 @@ A simple Ruby gem that lets you finger GitHub users.
         -H, --no-header                  Suppress header and prefix repo name with user
         -h, --help                       Show this message
         -v, --version                    Show version
-
 
 ## Examples
 
