@@ -11,6 +11,7 @@ op = OptionParser.new {|o|
   o.separator ""
   o.separator "Specific options:"
   o.on("-s", "--sort FIELD", "Sort on FIELD; you can try to abbreviate FIELD") { |field| opts[:sort] = field }
+  o.on("-t", "--type TYPE", "Filter results to TYPE (s for source, f for fork)") { |v| opts[:type] = v }
   o.on("-r", "--reverse", "Reverse default order") { opts[:reverse] = true }
   o.on("-H", "--no-header", "Suppress header and prefix repo name with user") { 
     opts[:noheader] = true
@@ -73,6 +74,9 @@ res = res.sort_by {|x|
   sort_value.downcase! if sort_field == 'repo'
   sort_value
 }
+if opts[:type]
+  res.select! {|x| x['type'] =~ /^#{opts[:type]}/}
+end
 
 # default order for date and counts is latest or greatest first
 res.reverse! if %w(updated pushed w i f).member?(sort_field)
