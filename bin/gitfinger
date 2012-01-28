@@ -10,8 +10,8 @@ op = OptionParser.new {|o|
   o.banner = "Usage: gitfinger [GitHub username]"
   o.separator ""
   o.separator "Specific options:"
-  o.on("-s", "--sort [FIELD]", "Order on FIELD") { |field| opts[:sort] = field }
-  o.on("-r", "--reverse", "Reverse standard order") { opts[:reverse] = true }
+  o.on("-s", "--sort FIELD", "Sort on FIELD; you can try to abbreviate FIELD") { |field| opts[:sort] = field }
+  o.on("-r", "--reverse", "Reverse default order") { opts[:reverse] = true }
   o.on("-H", "--no-header", "Suppress header and prefix repo name with user") { 
     opts[:noheader] = true
   }
@@ -48,8 +48,12 @@ def truncate(s, len)
   s.length > len ? s[0,len-3] + '...' : s
 end
 
+# first of each pair is displayed, the 2nd is the corresponding GitHub API key
+KEYS = %w( repo name w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description )
+COLUMNS = KEYS.each_slice(2).map(&:first)
+
 res = repos.map {|r|
-  d = %w( repo name w watchers f forks i open_issues updated updated_at pushed pushed_at type fork desc description).each_slice(2).reduce({}) {|m, (display_key,api_key)|
+  d = KEYS.each_slice(2).reduce({}) {|m, (display_key,api_key)|
     m[display_key] = r[api_key]
     m
   }
@@ -59,7 +63,7 @@ res = repos.map {|r|
   d
 }
 
-sort_field =  opts[:sort] || 'updated' 
+sort_field =  opts[:sort] ? COLUMNS.detect {|c| c =~ /^#{opts[:sort]}/} : 'updated' 
 res = res.sort_by {|x| 
   sort_value = x[sort_field] 
   if sort_value.nil? 
