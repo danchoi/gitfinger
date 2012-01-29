@@ -13,6 +13,7 @@ op = OptionParser.new {|o|
   o.on("-s", "--sort FIELD", "Sort on FIELD; you can try to abbreviate FIELD") { |field| opts[:sort] = field }
   o.on("-t", "--type TYPE", "Filter results to TYPE (s for source, f for fork)") { |v| opts[:type] = v }
   o.on("-r", "--reverse", "Reverse default order") { opts[:reverse] = true }
+  o.on("-l", "--left-justify", "Left-justify the repo column") { opts[:leftj] = true }
   o.on("-H", "--no-header", "Suppress header and prefix repo name with user") { 
     opts[:noheader] = true
   }
@@ -90,7 +91,7 @@ abort "No repositories found for #{user}" unless !res.empty?
 
 longest_name_len = res.reduce(0) {|max, row| [max, row['repo'].length].max }
 
-placeholders = "%#{longest_name_len}s%6s%5s%4s%13s%13s%9s  "
+placeholders = "%#{opts[:leftj] ? '-' : nil}#{longest_name_len}s%6s%5s%4s%13s%13s%9s  "
 desc_length = `tput cols`.to_i - (placeholders.scan(/\d+/).map(&:to_i).reduce(0){|sum,x| sum+x} + 3)
 placeholders += "%-#{desc_length}s"
 

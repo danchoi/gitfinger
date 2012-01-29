@@ -19,6 +19,7 @@ A simple Ruby gem that lets you finger GitHub users.
         -s, --sort FIELD                 Sort on FIELD; you can try to abbreviate FIELD
         -t, --type TYPE                  Filter results to TYPE (s for source, f for fork)
         -r, --reverse                    Reverse default order
+        -l, --left-justify               Left-justify the repo column
         -H, --no-header                  Suppress header and prefix repo name with user
         -h, --help                       Show this message
         -v, --version                    Show version
